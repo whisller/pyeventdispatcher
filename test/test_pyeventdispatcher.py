@@ -58,14 +58,31 @@ class TestRegister:
         with pytest.raises(PyEventDispatcherException):
             py_event_dispatcher.register("foo.bar", "")
 
-    @pytest.mark.parametrize(
-        "priority",
-        [
-            None,
-            ""
-        ],
-    )
+    @pytest.mark.parametrize("priority", [None, ""])
     def test_it_raises_an_exception_when_priority_is_not_integer(self, priority):
         py_event_dispatcher = PyEventDispatcher()
         with pytest.raises(PyEventDispatcherException):
-            py_event_dispatcher.register("foo.bar", lambda event: print(event), priority)
+            py_event_dispatcher.register(
+                "foo.bar", lambda event: print(event), priority
+            )
+
+
+class TestRegisterGlobal:
+    def test_it_allows_to_register_listener_globally(self, capsys):
+        def my_listener(event):
+            print("my_listener")
+
+        def global_listener(event):
+            print("global")
+
+        PyEventDispatcher.register_global("foo.bar", global_listener)
+
+        py_event_dispatcher_1 = PyEventDispatcher()
+        py_event_dispatcher_1.register("foo.bar", my_listener)
+        py_event_dispatcher_2 = PyEventDispatcher()
+        py_event_dispatcher_2.register("foo.bar", my_listener)
+
+        py_event_dispatcher_1.dispatch(PyEvent("foo.bar", None))
+        captured = capsys.readouterr()
+
+        assert captured.out == "my_listener\nglobal\n"
