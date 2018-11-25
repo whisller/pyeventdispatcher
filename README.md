@@ -3,11 +3,7 @@ PyEventDispatcher allows your application components to communicate with each
 other by sending events and listening to them.
 
 ## Listeners
-Listeners are just callables, lambdas, functions, object functions.
-
-## Registering local listeners
-In your application you can have multiple instances of PyEventDispatcher
-all of them can have different listeners and events dispatched.
+Listeners must be valid callables. So any lambdas, functions, object functions are fine.
 
 ```python
 from pyeventdispatcher import PyEventDispatcher
@@ -22,6 +18,17 @@ def on_event(event):
 py_event_dispatcher = PyEventDispatcher()
 py_event_dispatcher.register("foo.bar", MyListener().on_event)
 py_event_dispatcher.register("foo.bar", on_event)
+py_event_dispatcher.register("foo.bar", lambda event: print("lambda"))
+```
+
+## Registering local listeners
+In your application you can have multiple instances of PyEventDispatcher
+all of them can have different listeners and events dispatched.
+
+```python
+from pyeventdispatcher import PyEventDispatcher
+
+py_event_dispatcher = PyEventDispatcher()
 py_event_dispatcher.register("foo.bar", lambda event: print("lambda"))
 ```
 
@@ -41,7 +48,7 @@ py_event_dispatcher_2 = PyEventDispatcher()
 py_event_dispatcher_2.register("foo.bar", lambda event: print("lambda"))
 ```
 
-## Registering listeners with priority
+## Registering listeners with execution priority
 Listeners are executed by priority value, which by default is set to "0".
 
 You can change priority of registered listener to define in which order it will be executed.
