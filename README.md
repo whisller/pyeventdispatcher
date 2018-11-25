@@ -9,6 +9,13 @@ other by sending events and listening to them.
 
 Inspiration for that was Symfony's [event-dispatcher](https://symfony.com/doc/current/components/event_dispatcher.html) component.
 
+## Installation
+Python 3.6+
+
+```bash
+pip install pyeventdispatcher
+```
+
 ## Listeners
 Listeners must be valid callables. So any lambdas, functions, object functions are fine.
 
