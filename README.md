@@ -40,3 +40,28 @@ py_event_dispatcher_1.register("foo.bar", lambda event: print("lambda"))
 py_event_dispatcher_2 = PyEventDispatcher()
 py_event_dispatcher_2.register("foo.bar", lambda event: print("lambda"))
 ```
+
+## Registering listeners with priority
+Listeners are executed by priority value, which by default is set to "0".
+
+You can change priority of registered listener to define in which order it will be executed.
+
+```python
+from pyeventdispatcher import PyEventDispatcher
+
+py_event_dispatcher = PyEventDispatcher()
+py_event_dispatcher.register("foo.bar", lambda event: print("second"))
+py_event_dispatcher.register("foo.bar", lambda event: print("first"), -100)
+```
+
+## Dispatching an event
+
+```python
+from pyeventdispatcher import PyEventDispatcher, PyEvent
+
+py_event_dispatcher = PyEventDispatcher()
+py_event_dispatcher.register("foo.bar", lambda event: print(event.name))
+
+py_event_dispatcher.dispatch(PyEvent("foo.bar", {}))
+# foo.bar
+```
