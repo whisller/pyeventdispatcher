@@ -2,6 +2,8 @@
 PyEventDispatcher allows your application components to communicate with each
 other by sending events and listening to them.
 
+Inspiration for that was Symfony's [event-dispatcher](https://symfony.com/doc/current/components/event_dispatcher.html) component.
+
 ## Listeners
 Listeners must be valid callables. So any lambdas, functions, object functions are fine.
 
