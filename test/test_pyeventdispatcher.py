@@ -86,3 +86,22 @@ class TestRegisterGlobal:
         captured = capsys.readouterr()
 
         assert captured.out == "my_listener\nglobal\n"
+
+
+class TestStopPropagation:
+    def test_it_stops_propagation(self, capsys):
+        def first_listener(event):
+            event.stop = True
+            print("first_listener")
+
+        def second_listener(event):
+            print("first_listener")
+
+        py_event_dispatcher = PyEventDispatcher()
+        py_event_dispatcher.register("foo.bar", first_listener)
+        py_event_dispatcher.register("foo.bar", second_listener)
+        py_event_dispatcher.dispatch(PyEvent("foo.bar", {}))
+
+        captured = capsys.readouterr()
+
+        assert captured.out == "first_listener\n"

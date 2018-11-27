@@ -11,6 +11,7 @@ class PyEvent:
     def __init__(self, name, data):
         self.name = name
         self.data = data
+        self.stop = False
 
 
 class PyEventDispatcher:
@@ -41,7 +42,8 @@ class PyEventDispatcher:
         )
 
         for info in all_listeners:
-            info["listener"](event)
+            if not event.stop:
+                info["listener"](event)
 
     @staticmethod
     def _validate(listener, position):
