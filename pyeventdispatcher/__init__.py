@@ -1,5 +1,7 @@
 from collections import defaultdict
 
+__version__ = "1.0.0"
+
 
 class PyEventDispatcherException(Exception):
     pass

@@ -2,6 +2,8 @@ import json
 import os
 from setuptools import setup, find_packages
 
+from pyeventdispatcher import __version__
+
 with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), "README.md")) as f:
     README = f.read()
 
@@ -19,7 +21,7 @@ with open("Pipfile.lock") as fd:
 setup(
     name="pyeventdispatcher",
     description="",
-    version="1.0.0",
+    version=__version__,
     long_description=README,
     install_requires=install_requires,
     tests_require=tests_require,
