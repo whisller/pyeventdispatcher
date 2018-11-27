@@ -1,6 +1,13 @@
+from collections import defaultdict
+
 import pytest
 
-from pyeventdispatcher import PyEventDispatcher, PyEvent, PyEventDispatcherException
+from pyeventdispatcher import (
+    PyEventDispatcher,
+    PyEvent,
+    PyEventDispatcherException,
+    PyEventSubscriber,
+)
 
 
 class TestRegister:
@@ -68,6 +75,9 @@ class TestRegister:
 
 
 class TestRegisterGlobal:
+    def setup_method(self):
+        PyEventDispatcher._GLOBAL_LISTENERS = defaultdict(list)
+
     def test_it_allows_to_register_listener_globally(self, capsys):
         def my_listener(event):
             print("my_listener")
@@ -88,7 +98,33 @@ class TestRegisterGlobal:
         assert captured.out == "my_listener\nglobal\n"
 
 
+class TestRegisterSubscribers:
+    def setup_method(self):
+        PyEventDispatcher._GLOBAL_LISTENERS = defaultdict(list)
+
+    class MySubscriber1(PyEventSubscriber):
+        EVENTS = {"foo.bar": "execute_one", "bar.foo": ("execute_two", -10)}
+
+        @staticmethod
+        def execute_one(event):
+            print("MySubscriber1::execute_one")
+
+        @staticmethod
+        def execute_two(event):
+            print("MySubscriber1::execute_two")
+
+    def test_register_global_listeners_by_subscriber(self, capsys):
+        py_event_dispatcher = PyEventDispatcher()
+        py_event_dispatcher.dispatch(PyEvent("foo.bar", None))
+
+        captured = capsys.readouterr()
+        assert captured.out == "MySubscriber1::execute_one\n"
+
+
 class TestStopPropagation:
+    def setup_method(self):
+        PyEventDispatcher._GLOBAL_LISTENERS = defaultdict(list)
+
     def test_it_stops_propagation(self, capsys):
         def first_listener(event):
             event.stop = True

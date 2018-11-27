@@ -66,6 +66,29 @@ py_event_dispatcher_2 = PyEventDispatcher()
 py_event_dispatcher_2.register("foo.bar", lambda event: print("lambda"))
 ```
 
+## Registering global listeners with subscribers
+Other option to register your listener is to use "subscriber".
+Subscriber is a class that extends `PyEventSubscriber`.
+
+```python
+from pyeventdispatcher import PyEvent, PyEventDispatcher, PyEventSubscriber
+
+class MySubscriber1(PyEventSubscriber):
+    EVENTS = {"foo.bar": "execute_one", "bar.foo": ("execute_two", -10)}
+
+    @staticmethod
+    def execute_one(event):
+        print("MySubscriber1::execute_one")
+
+    @staticmethod
+    def execute_two(event):
+        print("MySubscriber1::execute_two")
+
+py_event_dispatcher = PyEventDispatcher()
+py_event_dispatcher.dispatch(PyEvent("foo.bar", None))
+# MySubscriber1::execute_one
+```
+
 ## Registering listeners with execution priority
 Listeners are executed by priority value, which by default is set to "0".
 
