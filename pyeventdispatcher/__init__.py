@@ -24,8 +24,6 @@ class PyEventDispatcher:
     def __init__(self):
         self._listeners = defaultdict(list)
 
-        self._register_subscribers()
-
     def register(self, event_name, listener, position=0):
         PyEventDispatcher._validate(listener, position)
 
@@ -39,7 +37,7 @@ class PyEventDispatcher:
             {"listener": listener, "position": position}
         )
 
-    def _register_subscribers(self):
+    def register_subscribers(self):
         for subscriber_class in PyEventSubscriber.__subclasses__():
             for event_name, options in subscriber_class.EVENTS.items():
                 if type(options) is tuple:

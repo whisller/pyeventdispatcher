@@ -85,6 +85,7 @@ class MySubscriber1(PyEventSubscriber):
         print("MySubscriber1::execute_two")
 
 py_event_dispatcher = PyEventDispatcher()
+py_event_dispatcher.register_subscribers()
 py_event_dispatcher.dispatch(PyEvent("foo.bar", None))
 # MySubscriber1::execute_one
 ```

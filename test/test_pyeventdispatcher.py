@@ -115,6 +115,7 @@ class TestRegisterSubscribers:
 
     def test_register_global_listeners_by_subscriber(self, capsys):
         py_event_dispatcher = PyEventDispatcher()
+        py_event_dispatcher.register_subscribers()
         py_event_dispatcher.dispatch(PyEvent("foo.bar", None))
 
         captured = capsys.readouterr()
