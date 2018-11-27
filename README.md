@@ -9,6 +9,10 @@ other by sending events and listening to them.
 
 Inspiration for that was Symfony's [event-dispatcher](https://symfony.com/doc/current/components/event_dispatcher.html) component.
 
+**Disclaimer**
+
+Application is in very early stage of development. Quite a lot of things might change in interface :)
+
 ## Installation
 Python 3.6+
 
@@ -85,4 +89,24 @@ py_event_dispatcher.register("foo.bar", lambda event: print(event.name))
 
 py_event_dispatcher.dispatch(PyEvent("foo.bar", {}))
 # foo.bar
+```
+
+## Stopping propagation
+Sometimes you might want to stop propagation of event, for that you just have to set `event.stop` to `True`,
+
+In example below only `first_listener` will be executed.
+
+```python
+from pyeventdispatcher import PyEventDispatcher
+
+def first_listener(event):
+    event.stop = True
+    print("first_listener")
+
+def second_listener(event):
+    print("first_listener")
+
+py_event_dispatcher = PyEventDispatcher()
+py_event_dispatcher.register("foo.bar", first_listener)
+py_event_dispatcher.register("foo.bar", second_listener)
 ```
