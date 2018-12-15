@@ -7,7 +7,7 @@ from pyeventdispatcher import (
     PyEvent,
     PyEventDispatcherException,
     PyEventSubscriber,
-)
+    listener)
 
 
 class TestRegister:
@@ -32,19 +32,19 @@ class TestRegister:
         [
             # With default "priority" - in order they were added
             (
-                (
-                    {"lambda": lambda event: print("First"), "priority": 0},
-                    {"lambda": lambda event: print("Second"), "priority": 0},
-                ),
-                "First\nSecond\n",
+                    (
+                            {"lambda": lambda event: print("First"), "priority": 0},
+                            {"lambda": lambda event: print("Second"), "priority": 0},
+                    ),
+                    "First\nSecond\n",
             ),
             # Based on priority
             (
-                (
-                    {"lambda": lambda event: print("First"), "priority": 0},
-                    {"lambda": lambda event: print("Second"), "priority": -100},
-                ),
-                "Second\nFirst\n",
+                    (
+                            {"lambda": lambda event: print("First"), "priority": 0},
+                            {"lambda": lambda event: print("Second"), "priority": -100},
+                    ),
+                    "Second\nFirst\n",
             ),
         ],
     )
@@ -120,6 +120,22 @@ class TestRegisterSubscribers:
 
         captured = capsys.readouterr()
         assert captured.out == "MySubscriber1::execute_one\n"
+
+
+class TestRegisterThroughDecorator:
+    def setup_method(self):
+        PyEventDispatcher._GLOBAL_LISTENERS = defaultdict(list)
+
+    def test_register_global_listener_by_decorator(self, capsys):
+        @listener("foo.bar")
+        def my_test_function(event):
+            print(event.name)
+
+        py_event_dispatcher = PyEventDispatcher()
+        py_event_dispatcher.dispatch(PyEvent("foo.bar", None))
+
+        captured = capsys.readouterr()
+        assert captured.out == "foo.bar\n"
 
 
 class TestStopPropagation:

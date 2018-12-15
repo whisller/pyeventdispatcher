@@ -1,3 +1,4 @@
+import functools
 from collections import defaultdict
 
 __version__ = "1.0.0"
@@ -37,6 +38,8 @@ class PyEventDispatcher:
             {"listener": listener, "position": position}
         )
 
+    # @TODO Think about nicer way of doing that
+    # Maybe something like PyEventSubscriberLoader?
     def register_subscribers(self):
         for subscriber_class in PyEventSubscriber.__subclasses__():
             for event_name, options in subscriber_class.EVENTS.items():
@@ -71,3 +74,23 @@ class PyEventDispatcher:
             float(position)
         except (ValueError, TypeError):
             raise PyEventDispatcherException(f'"{position}" is not numeric.')
+
+
+def listener(*args):
+    def decorator_listener(func):
+        for arg in args:
+            if type(arg) == tuple:
+                event_name = arg[0]
+                position = arg[1]
+            else:
+                event_name = arg
+                position = 0
+            PyEventDispatcher.register_global(event_name, func, position)
+
+        @functools.wraps(func)
+        def wrapper_listener(*_args, **kwargs):
+            return func(*_args, **kwargs)
+
+        return wrapper_listener
+
+    return decorator_listener

@@ -14,8 +14,6 @@ Inspiration for that was Symfony's [event-dispatcher](https://symfony.com/doc/cu
 Application is in very early stage of development. Quite a lot of things might change in interface :)
 
 ## Installation
-Python 3.6+
-
 ```bash
 pip install pyeventdispatcher
 ```
@@ -88,6 +86,20 @@ py_event_dispatcher = PyEventDispatcher()
 py_event_dispatcher.register_subscribers()
 py_event_dispatcher.dispatch(PyEvent("foo.bar", None))
 # MySubscriber1::execute_one
+```
+
+## Registering global listeners with decorator
+```python
+from pyeventdispatcher import PyEvent, PyEventDispatcher, listener
+
+py_event_dispatcher = PyEventDispatcher()
+
+
+@listener("foo.bar", ("bar.foo", -10))
+def my_func(event):
+    print(event.name)
+
+py_event_dispatcher.dispatch(PyEvent("foo.bar", {}))
 ```
 
 ## Registering listeners with execution priority
