@@ -19,15 +19,9 @@ class PyEventSubscriber:
 
 class PyEventDispatcher:
     _GLOBAL_LISTENERS = defaultdict(list)
-    _DEFAULT_CONFIG = {
-        "disable_global": False  # @TODO add functionality for it
-    }
 
-    def __init__(self, config=None):
+    def __init__(self):
         self._listeners = defaultdict(list)
-
-        config = {} if not config else config
-        self._config = {**PyEventDispatcher._DEFAULT_CONFIG, **config}
 
     @staticmethod
     def register(event_name, listener, position=0):
