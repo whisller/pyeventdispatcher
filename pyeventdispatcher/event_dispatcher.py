@@ -44,10 +44,14 @@ class PyEventDispatcher:
 
     def dispatch(self, event, to_global=True):
         local_listeners = self._local_registry[event.name]
-        gloabl_listeners = global_registry[event.name]
+
+        if to_global:
+            global_listeners = global_registry[event.name]
+        else:
+            global_listeners = []
 
         all_listeners = sorted(
-            local_listeners + gloabl_listeners, key=lambda x: x["position"]
+            local_listeners + global_listeners, key=lambda x: x["position"]
         )
 
         for info in all_listeners:
