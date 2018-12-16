@@ -17,41 +17,34 @@ class PyEventSubscriber:
     EVENTS = {}
 
 
-class GlobalMemoryRegistry:
-    _LISTENERS = defaultdict(list)
+class MemoryRegistry:
+    def __init__(self):
+        self._listeners = defaultdict(list)
 
-    @staticmethod
-    def register(name, listener, position):
-        GlobalMemoryRegistry._LISTENERS[name].append(
-            {"listener": listener, "position": position}
-        )
+    def register(self, name, listener, position):
+        self._listeners[name].append({"listener": listener, "position": position})
 
-    @staticmethod
-    def get(name):
-        return (
-            GlobalMemoryRegistry._LISTENERS[name]
-            if name in GlobalMemoryRegistry._LISTENERS
-            else []
-        )
+    def __getitem__(self, name):
+        return self._listeners[name]
 
 
-registry = GlobalMemoryRegistry
+global_registry = MemoryRegistry()
 
 
 class PyEventDispatcher:
     def __init__(self):
-        self._local_listeners = defaultdict(list)
+        self._local_registry = MemoryRegistry()
 
     def register_local(self, event_name, listener, position=0):
         _validate_registration(listener, position)
 
-        self._local_listeners[event_name].append(
+        self._local_registry[event_name].append(
             {"listener": listener, "position": position}
         )
 
     def dispatch(self, event, to_global=True):
-        local_listeners = self._local_listeners.get(event.name, [])
-        gloabl_listeners = registry.get(event.name)
+        local_listeners = self._local_registry[event.name]
+        gloabl_listeners = global_registry[event.name]
 
         all_listeners = sorted(
             local_listeners + gloabl_listeners, key=lambda x: x["position"]
@@ -63,7 +56,7 @@ class PyEventDispatcher:
 
 
 def dispatch_global(event):
-    for info in registry.get(event.name):
+    for info in global_registry[event.name]:
         if not event.stop:
             info["listener"](event)
 
@@ -71,7 +64,7 @@ def dispatch_global(event):
 def register_global_listener(event_name, listener, position=0):
     _validate_registration(listener, position)
 
-    registry.register(event_name, listener, position)
+    global_registry.register(event_name, listener, position)
 
 
 def register_event_subscribers():
