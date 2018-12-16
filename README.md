@@ -40,8 +40,7 @@ from pyeventdispatcher import PyEventDispatcher
 # By default we register all listeners in static global registry
 PyEventDispatcher.register("foo.bar", lambda event: print("global listener"))
 
-# But you can have several instances
-# By default they dispatch to global listeners as well
+# But you can have several instances of event dispatcher
 py_event_dispatcher_1 = PyEventDispatcher()
 py_event_dispatcher_1.register_local("foo.bar", lambda event: print("event dispatcher 1"))
 
@@ -120,18 +119,18 @@ PyEventDispatcher.register("foo.bar", lambda event: print(f"{event.name}::global
 py_event_dispatcher = PyEventDispatcher()
 py_event_dispatcher.register_local("foo.bar", lambda event: print(f"{event.name}::local"))
 
-# Dispatch global event
+# Dispatch event to global listeners only
 dispatch(PyEvent("foo.bar"))
 # Output: 
 # foo.bar::global
 
-# Dispatch local event to both global and local listeners
+# Dispatch event to both global and local listeners
 py_event_dispatcher.dispatch(PyEvent("foo.bar"))
 # Output: 
 # foo.bar::global
 # foo.bar::local
 
-# Dispatch local event to only local listeners
+# Dispatch event to local listeners only
 py_event_dispatcher.dispatch(PyEvent("foo.bar"), False)
 # Output:
 # foo.bar::local
