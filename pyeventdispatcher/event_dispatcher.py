@@ -72,6 +72,7 @@ def register_global_listener(event_name, listener, position=0):
 
 
 def register_event_subscribers():
+    # @TODO do it automatically?
     for subscriber_class in EventSubscriber.__subclasses__():
         for event_name, options in subscriber_class.EVENTS.items():
             if type(options) is tuple:

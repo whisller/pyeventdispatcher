@@ -33,27 +33,6 @@ Below function is simplest example of listener you can define:
 ```python
 def my_listener(event):
     print(event.name)
-``` 
-
-## Global and local listeners
-In most of the cases your application will only need one  global registration of listeners that is used across
-whole application.
-
-But you might want to have different instances of PyEventDispatcher in your application. 
-For that you can use concept of "local" listeners and dispatchers.
-
-```python
-from pyeventdispatcher import EventDispatcher, register
-
-# By default we register all listeners in  global registry
-register("foo.bar", lambda event: print("global listener"))
-
-# But you can have several instances of event dispatcher
-py_event_dispatcher_1 = EventDispatcher()
-py_event_dispatcher_1.register("foo.bar", lambda event: print("event dispatcher 1"))
-
-py_event_dispatcher_2 = EventDispatcher()
-py_event_dispatcher_2.register("foo.bar", lambda event: print("event dispatcher 2"))
 ```
 
 ## Registering global listener
@@ -94,7 +73,28 @@ class MySubscriber(EventSubscriber):
     def execute_two(event):
         print(event.name)
 
-register_event_subscribers()
+register_event_subscribers() # Register your classes
+```
+
+## Local listeners
+In most of the cases your application will only need one global registration of listeners that is used across
+whole application.
+
+Buf if you need, you can initialise as many instances of EventDispatcher as you wish. Everyone of them will have
+local registry of listeners.
+
+```python
+from pyeventdispatcher import EventDispatcher, register
+
+# Register listener in  global registry
+register("foo.bar", lambda event: print("global listener"))
+
+# Initialise instances of local EventDispatcher
+py_event_dispatcher_1 = EventDispatcher()
+py_event_dispatcher_1.register("foo.bar", lambda event: print("event dispatcher 1"))
+
+py_event_dispatcher_2 = EventDispatcher()
+py_event_dispatcher_2.register("foo.bar", lambda event: print("event dispatcher 2"))
 ```
 
 ## Registering listeners with execution priority
@@ -111,27 +111,27 @@ register("foo.bar", lambda event: print("first "), -100)
 ```
 
 ## Dispatching an event
-As mentioned before you have global  registry of listeners but also you can initialise manually instance of
-PyEventDispatcher. 
+When you dispatch your event, every registered listener that listens for occurrence of specified event,
+will be called with event object as parameter.
 
-When dispatching an event you have options, either you will dispatch event to global registry or your local instance, 
-which in fact can also dispatch event to global registry. 
-
-I know that it might sound complicated, but let's have a look at an example :)
-
+### Dispatching global event
 ```python
-from pyeventdispatcher import dispatch, EventDispatcher, Event, register
+from pyeventdispatcher import dispatch, Event, register
 
-# Register global listener
+register("foo.bar", lambda event: print(event.name))
+
+dispatch(Event("foo.bar", {"id": 1}))
+```
+
+### Dispatching local event
+```python
+from pyeventdispatcher import EventDispatcher, Event, register
+
 register("foo.bar", lambda event: print(f"{event.name}::global"))
 
 # Initialise separated instance
 py_event_dispatcher = EventDispatcher()
 py_event_dispatcher.register("foo.bar", lambda event: print(f"{event.name}::local"))
-
-# Dispatch event to global listeners only
-dispatch(Event("foo.bar"))
-# foo.bar::global
 
 # Dispatch event to both global and local listeners
 py_event_dispatcher.dispatch(Event("foo.bar"))
