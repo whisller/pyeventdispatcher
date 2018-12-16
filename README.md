@@ -28,15 +28,16 @@ def my_listener(event):
 ``` 
 
 ## Global and local listeners
-In most of the cases your application will need only one instance of PyEventDispatcher to distribute events.
+In most of the cases your application will only need one static global registration of listeners that is used across
+whole application.
 
-But you can register as many instances as you wish.
+But you might want to have different instances of PyEventDispatcher in your application. 
+For that you can use concept of "local" listeners and dispatchers.
 
 ```python
 from pyeventdispatcher import PyEventDispatcher
 
-# By default we register all listeners globally
-# so they are shared across all instances
+# By default we register all listeners in static global registry
 PyEventDispatcher.register("foo.bar", lambda event: print("global listener"))
 
 # But you can have several instances
@@ -44,13 +45,12 @@ PyEventDispatcher.register("foo.bar", lambda event: print("global listener"))
 py_event_dispatcher_1 = PyEventDispatcher()
 py_event_dispatcher_1.register_local("foo.bar", lambda event: print("event dispatcher 1"))
 
-# But you can disable global listeners with `disable_global` config
-py_event_dispatcher_2 = PyEventDispatcher({"disable_global": True})
+py_event_dispatcher_2 = PyEventDispatcher()
 py_event_dispatcher_2.register_local("foo.bar", lambda event: print("event dispatcher 2"))
 ```
 
-## Registering listener
-There is several ways of registering your listener, you can mix styles or keep one across whole application.
+## Registering global listener
+There is several ways of registering your global listener, you can mix styles or keep one across whole application.
 
 ### `register` function
 ```python
@@ -94,23 +94,47 @@ Listeners are executed in order of priority parameter's value, which by default 
 You can change priority of registered listener to define in which order it will be executed.
 
 ```python
-from pyeventdispatcher import PyEventDispatcher
+from pyeventdispatcher import register
 
-PyEventDispatcher.register("foo.bar", lambda event: print("second"))
-PyEventDispatcher.register("foo.bar", lambda event: print("first "), -100)
+register("foo.bar", lambda event: print("second"))
+register("foo.bar", lambda event: print("first "), -100)
 # first second
 ```
 
 ## Dispatching an event
+As mentioned before you have global static registry of listeners but also you can initialise manually instance of
+PyEventDispatcher. 
+
+When dispatching an event you have options, either you will dispatch event to global registry or your local instance, 
+which in fact can also dispatch event to static global registry. 
+
+I know that it might sound complicated, but let's have a look at an example :)
 
 ```python
-from pyeventdispatcher import PyEventDispatcher, PyEvent
+from pyeventdispatcher import dispatch, PyEventDispatcher, PyEvent
 
-PyEventDispatcher.register("foo.bar", lambda event: print(event.name))
+# Register global listener
+PyEventDispatcher.register("foo.bar", lambda event: print(f"{event.name}::global"))
 
+# Initialise separated instance of PyEventDispatcher
 py_event_dispatcher = PyEventDispatcher()
+py_event_dispatcher.register_local("foo.bar", lambda event: print(f"{event.name}::local"))
+
+# Dispatch global event
+dispatch(PyEvent("foo.bar"))
+# Output: 
+# foo.bar::global
+
+# Dispatch local event to both global and local listeners
 py_event_dispatcher.dispatch(PyEvent("foo.bar"))
-# foo.bar
+# Output: 
+# foo.bar::global
+# foo.bar::local
+
+# Dispatch local event to only local listeners
+py_event_dispatcher.dispatch(PyEvent("foo.bar"), False)
+# Output:
+# foo.bar::local
 ```
 
 ## Stopping propagation

@@ -29,11 +29,6 @@ class PyEventDispatcher:
         config = {} if not config else config
         self._config = {**PyEventDispatcher._DEFAULT_CONFIG, **config}
 
-    def register_local(self, event_name, listener, position=0):
-        PyEventDispatcher._validate(listener, position)
-
-        self._listeners[event_name].append({"listener": listener, "position": position})
-
     @staticmethod
     def register(event_name, listener, position=0):
         PyEventDispatcher._validate(listener, position)
@@ -41,6 +36,11 @@ class PyEventDispatcher:
         PyEventDispatcher._GLOBAL_LISTENERS[event_name].append(
             {"listener": listener, "position": position}
         )
+
+    def register_local(self, event_name, listener, position=0):
+        PyEventDispatcher._validate(listener, position)
+
+        self._listeners[event_name].append({"listener": listener, "position": position})
 
     # @TODO Think about nicer way of doing that
     # Maybe something like PyEventSubscriberLoader?
@@ -57,7 +57,13 @@ class PyEventDispatcher:
                 listener = getattr(subscriber_class, method_name)
                 PyEventDispatcher.register(event_name, listener, position)
 
-    def dispatch(self, event):
+    @staticmethod
+    def dispatch_global(event):
+        for info in PyEventDispatcher._GLOBAL_LISTENERS.get(event.name, []):
+            if not event.stop:
+                info["listener"](event)
+
+    def dispatch(self, event, to_global=True):
         local_listeners = self._listeners.get(event.name, [])
         gloabl_listeners = PyEventDispatcher._GLOBAL_LISTENERS.get(event.name, [])
 
