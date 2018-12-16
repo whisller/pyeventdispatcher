@@ -2,10 +2,10 @@ import pytest
 import pyeventdispatcher
 
 from pyeventdispatcher import (
-    PyEventDispatcher,
-    PyEvent,
-    PyEventDispatcherException,
-    PyEventSubscriber,
+    EventDispatcher,
+    Event,
+    EventDispatcherException,
+    EventSubscriber,
     listen,
 )
 from pyeventdispatcher.event_dispatcher import (
@@ -24,9 +24,9 @@ class TestRegister:
         "registered", [MyListener().call_on_event, lambda event: print(event.data)]
     )
     def test_it_allows_to_register(self, registered, capsys):
-        py_event_dispatcher = PyEventDispatcher()
+        py_event_dispatcher = EventDispatcher()
         py_event_dispatcher.register("foo.bar", registered)
-        py_event_dispatcher.dispatch(PyEvent("foo.bar", {"a": "b"}))
+        py_event_dispatcher.dispatch(Event("foo.bar", {"a": "b"}))
 
         captured = capsys.readouterr()
 
@@ -54,26 +54,26 @@ class TestRegister:
         ],
     )
     def test_listeners_executed_in_order(self, to_register, output, capsys):
-        py_event_dispatcher = PyEventDispatcher()
+        py_event_dispatcher = EventDispatcher()
         for register in to_register:
             py_event_dispatcher.register(
                 "foo.bar", register["lambda"], register["priority"]
             )
-        py_event_dispatcher.dispatch(PyEvent("foo.bar", {"a": "b"}))
+        py_event_dispatcher.dispatch(Event("foo.bar", {"a": "b"}))
 
         captured = capsys.readouterr()
 
         assert captured.out == output
 
     def test_it_raises_an_exception_when_non_callable_is_trying_to_be_registered(self):
-        py_event_dispatcher = PyEventDispatcher()
-        with pytest.raises(PyEventDispatcherException):
+        py_event_dispatcher = EventDispatcher()
+        with pytest.raises(EventDispatcherException):
             py_event_dispatcher.register("foo.bar", "")
 
     @pytest.mark.parametrize("priority", [None, ""])
     def test_it_raises_an_exception_when_priority_is_not_integer(self, priority):
-        py_event_dispatcher = PyEventDispatcher()
-        with pytest.raises(PyEventDispatcherException):
+        py_event_dispatcher = EventDispatcher()
+        with pytest.raises(EventDispatcherException):
             py_event_dispatcher.register(
                 "foo.bar", lambda event: print(event), priority
             )
@@ -92,12 +92,12 @@ class TestRegisterGlobal:
 
         register_global_listener("foo.bar", global_listener)
 
-        py_event_dispatcher_1 = PyEventDispatcher()
+        py_event_dispatcher_1 = EventDispatcher()
         py_event_dispatcher_1.register("foo.bar", my_listener)
-        py_event_dispatcher_2 = PyEventDispatcher()
+        py_event_dispatcher_2 = EventDispatcher()
         py_event_dispatcher_2.register("foo.bar", my_listener)
 
-        py_event_dispatcher_1.dispatch(PyEvent("foo.bar", None))
+        py_event_dispatcher_1.dispatch(Event("foo.bar", None))
         captured = capsys.readouterr()
 
         assert captured.out == "my_listener\nglobal\n"
@@ -107,7 +107,7 @@ class TestRegisterSubscribers:
     def setup_method(self):
         pyeventdispatcher.event_dispatcher.global_registry = MemoryRegistry()
 
-    class MySubscriber1(PyEventSubscriber):
+    class MySubscriber1(EventSubscriber):
         EVENTS = {"foo.bar": "execute_one", "bar.foo": ("execute_two", -10)}
 
         @staticmethod
@@ -120,8 +120,8 @@ class TestRegisterSubscribers:
 
     def test_register_global_listeners_by_subscriber(self, capsys):
         register_event_subscribers()
-        py_event_dispatcher = PyEventDispatcher()
-        py_event_dispatcher.dispatch(PyEvent("foo.bar", None))
+        py_event_dispatcher = EventDispatcher()
+        py_event_dispatcher.dispatch(Event("foo.bar", None))
 
         captured = capsys.readouterr()
         assert captured.out == "MySubscriber1::execute_one\n"
@@ -136,8 +136,8 @@ class TestRegisterThroughDecorator:
         def my_test_function(event):
             print(event.name)
 
-        py_event_dispatcher = PyEventDispatcher()
-        py_event_dispatcher.dispatch(PyEvent("foo.bar", None))
+        py_event_dispatcher = EventDispatcher()
+        py_event_dispatcher.dispatch(Event("foo.bar", None))
 
         captured = capsys.readouterr()
         assert captured.out == "foo.bar\n"
@@ -155,10 +155,10 @@ class TestStopPropagation:
         def second_listener(event):
             print("first_listener")
 
-        py_event_dispatcher = PyEventDispatcher()
+        py_event_dispatcher = EventDispatcher()
         py_event_dispatcher.register("foo.bar", first_listener)
         py_event_dispatcher.register("foo.bar", second_listener)
-        py_event_dispatcher.dispatch(PyEvent("foo.bar", {}))
+        py_event_dispatcher.dispatch(Event("foo.bar", {}))
 
         captured = capsys.readouterr()
 

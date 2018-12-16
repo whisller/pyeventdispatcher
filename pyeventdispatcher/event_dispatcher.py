@@ -2,18 +2,18 @@ import functools
 from collections import defaultdict
 
 
-class PyEventDispatcherException(Exception):
+class EventDispatcherException(Exception):
     pass
 
 
-class PyEvent:
+class Event:
     def __init__(self, name, data=None):
         self.name = name
         self.data = data
         self.stop = False
 
 
-class PyEventSubscriber:
+class EventSubscriber:
     EVENTS = {}
 
 
@@ -31,7 +31,7 @@ class MemoryRegistry:
 global_registry = MemoryRegistry()
 
 
-class PyEventDispatcher:
+class EventDispatcher:
     def __init__(self):
         self._local_registry = MemoryRegistry()
 
@@ -72,7 +72,7 @@ def register_global_listener(event_name, listener, position=0):
 
 
 def register_event_subscribers():
-    for subscriber_class in PyEventSubscriber.__subclasses__():
+    for subscriber_class in EventSubscriber.__subclasses__():
         for event_name, options in subscriber_class.EVENTS.items():
             if type(options) is tuple:
                 method_name = options[0]
@@ -107,9 +107,9 @@ def listen(*args):
 
 def _validate_registration(listener, position):
     if not callable(listener):
-        raise PyEventDispatcherException(f'"{listener}" is not callable.')
+        raise EventDispatcherException(f'"{listener}" is not callable.')
 
     try:
         float(position)
     except (ValueError, TypeError):
-        raise PyEventDispatcherException(f'"{position}" is not numeric.')
+        raise EventDispatcherException(f'"{position}" is not numeric.')

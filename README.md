@@ -6,12 +6,19 @@ PyEventDispatcher
 
 PyEventDispatcher allows your application components to communicate with each
 other by sending events and listening to them.
+Inspiration for this library was Symfony's [event-dispatcher](https://symfony.com/doc/current/components/event_dispatcher.html) component.
 
-Inspiration for that was Symfony's [event-dispatcher](https://symfony.com/doc/current/components/event_dispatcher.html) component.
-
-**Disclaimer**
-
+## Disclaimer
 Library is in very early stage of development. A lot of things can change, which includes breaking changes.
+
+## Easiest example
+```python
+from pyeventdispatcher import dispatch, Event, register
+
+register("foo.bar", lambda event: print(f"{event.name}::{event.data}"))
+dispatch(Event("foo.bar", "some data"))
+# foo.bar::some data
+```
 
 ## Installation
 ```bash
@@ -36,16 +43,16 @@ But you might want to have different instances of PyEventDispatcher in your appl
 For that you can use concept of "local" listeners and dispatchers.
 
 ```python
-from pyeventdispatcher import PyEventDispatcher, register
+from pyeventdispatcher import EventDispatcher, register
 
 # By default we register all listeners in  global registry
 register("foo.bar", lambda event: print("global listener"))
 
 # But you can have several instances of event dispatcher
-py_event_dispatcher_1 = PyEventDispatcher()
+py_event_dispatcher_1 = EventDispatcher()
 py_event_dispatcher_1.register("foo.bar", lambda event: print("event dispatcher 1"))
 
-py_event_dispatcher_2 = PyEventDispatcher()
+py_event_dispatcher_2 = EventDispatcher()
 py_event_dispatcher_2.register("foo.bar", lambda event: print("event dispatcher 2"))
 ```
 
@@ -72,11 +79,11 @@ def my_func(event):
     print(event.name)
 ```
 
-### By extending `PyEventSubscriber` class
+### By extending `EventSubscriber` class
 ```python
-from pyeventdispatcher import PyEventSubscriber, register_event_subscribers
+from pyeventdispatcher import EventSubscriber, register_event_subscribers
 
-class MySubscriber(PyEventSubscriber):
+class MySubscriber(EventSubscriber):
     EVENTS = {"foo.bar": "execute_one", "bar.foo": ("execute_two", -100)}
 
     @staticmethod
@@ -113,29 +120,26 @@ which in fact can also dispatch event to global registry.
 I know that it might sound complicated, but let's have a look at an example :)
 
 ```python
-from pyeventdispatcher import dispatch, PyEventDispatcher, PyEvent, register
+from pyeventdispatcher import dispatch, EventDispatcher, Event, register
 
 # Register global listener
 register("foo.bar", lambda event: print(f"{event.name}::global"))
 
-# Initialise separated instance of PyEventDispatcher
-py_event_dispatcher = PyEventDispatcher()
+# Initialise separated instance
+py_event_dispatcher = EventDispatcher()
 py_event_dispatcher.register("foo.bar", lambda event: print(f"{event.name}::local"))
 
 # Dispatch event to global listeners only
-dispatch(PyEvent("foo.bar"))
-# Output: 
+dispatch(Event("foo.bar"))
 # foo.bar::global
 
 # Dispatch event to both global and local listeners
-py_event_dispatcher.dispatch(PyEvent("foo.bar"))
-# Output: 
+py_event_dispatcher.dispatch(Event("foo.bar"))
 # foo.bar::global
 # foo.bar::local
 
 # Dispatch event to local listeners only
-py_event_dispatcher.dispatch(PyEvent("foo.bar"), False)
-# Output:
+py_event_dispatcher.dispatch(Event("foo.bar"), False)
 # foo.bar::local
 ```
 
@@ -145,7 +149,7 @@ Sometimes you might want to stop propagation of event, for that you just have to
 In example below only `first_listener` will be executed.
 
 ```python
-from pyeventdispatcher import PyEventDispatcher
+from pyeventdispatcher import register
 
 def first_listener(event):
     event.stop = True
@@ -154,8 +158,7 @@ def first_listener(event):
 def second_listener(event):
     print("first_listener")
 
-py_event_dispatcher = PyEventDispatcher()
-py_event_dispatcher.register("foo.bar", first_listener)
-py_event_dispatcher.register("foo.bar", second_listener)
+register("foo.bar", first_listener)
+register("foo.bar", second_listener)
 # first_listener
 ```

@@ -1,10 +1,10 @@
 from pyeventdispatcher.event_dispatcher import (
     dispatch_global_event,
     listen,
-    PyEventDispatcher,
-    PyEvent,
-    PyEventDispatcherException,
-    PyEventSubscriber,
+    EventDispatcher,
+    Event,
+    EventDispatcherException,
+    EventSubscriber,
     register_global_listener,
     register_event_subscribers
 )
