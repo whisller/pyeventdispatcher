@@ -9,7 +9,7 @@ other by sending events and listening to them.
 Inspiration for this library was Symfony's [event-dispatcher](https://symfony.com/doc/current/components/event_dispatcher.html) component.
 
 ## Disclaimer
-Library is in very early stage of development. A lot of things can change, which includes breaking changes.
+Library is in very early stage of development. A lot of things can change or might not work as expected, which includes breaking changes.
 
 ## Easiest example
 ```python
