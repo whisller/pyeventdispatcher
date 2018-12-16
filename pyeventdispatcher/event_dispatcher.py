@@ -35,7 +35,7 @@ class PyEventDispatcher:
     def __init__(self):
         self._local_registry = MemoryRegistry()
 
-    def register_local(self, event_name, listener, position=0):
+    def register(self, event_name, listener, position=0):
         _validate_registration(listener, position)
 
         self._local_registry[event_name].append(
@@ -59,7 +59,7 @@ class PyEventDispatcher:
                 info["listener"](event)
 
 
-def dispatch_global(event):
+def dispatch_global_event(event):
     for info in global_registry[event.name]:
         if not event.stop:
             info["listener"](event)

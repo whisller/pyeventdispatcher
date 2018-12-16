@@ -25,7 +25,7 @@ class TestRegister:
     )
     def test_it_allows_to_register(self, registered, capsys):
         py_event_dispatcher = PyEventDispatcher()
-        py_event_dispatcher.register_local("foo.bar", registered)
+        py_event_dispatcher.register("foo.bar", registered)
         py_event_dispatcher.dispatch(PyEvent("foo.bar", {"a": "b"}))
 
         captured = capsys.readouterr()
@@ -56,7 +56,7 @@ class TestRegister:
     def test_listeners_executed_in_order(self, to_register, output, capsys):
         py_event_dispatcher = PyEventDispatcher()
         for register in to_register:
-            py_event_dispatcher.register_local(
+            py_event_dispatcher.register(
                 "foo.bar", register["lambda"], register["priority"]
             )
         py_event_dispatcher.dispatch(PyEvent("foo.bar", {"a": "b"}))
@@ -68,13 +68,13 @@ class TestRegister:
     def test_it_raises_an_exception_when_non_callable_is_trying_to_be_registered(self):
         py_event_dispatcher = PyEventDispatcher()
         with pytest.raises(PyEventDispatcherException):
-            py_event_dispatcher.register_local("foo.bar", "")
+            py_event_dispatcher.register("foo.bar", "")
 
     @pytest.mark.parametrize("priority", [None, ""])
     def test_it_raises_an_exception_when_priority_is_not_integer(self, priority):
         py_event_dispatcher = PyEventDispatcher()
         with pytest.raises(PyEventDispatcherException):
-            py_event_dispatcher.register_local(
+            py_event_dispatcher.register(
                 "foo.bar", lambda event: print(event), priority
             )
 
@@ -93,9 +93,9 @@ class TestRegisterGlobal:
         register_global_listener("foo.bar", global_listener)
 
         py_event_dispatcher_1 = PyEventDispatcher()
-        py_event_dispatcher_1.register_local("foo.bar", my_listener)
+        py_event_dispatcher_1.register("foo.bar", my_listener)
         py_event_dispatcher_2 = PyEventDispatcher()
-        py_event_dispatcher_2.register_local("foo.bar", my_listener)
+        py_event_dispatcher_2.register("foo.bar", my_listener)
 
         py_event_dispatcher_1.dispatch(PyEvent("foo.bar", None))
         captured = capsys.readouterr()
@@ -156,8 +156,8 @@ class TestStopPropagation:
             print("first_listener")
 
         py_event_dispatcher = PyEventDispatcher()
-        py_event_dispatcher.register_local("foo.bar", first_listener)
-        py_event_dispatcher.register_local("foo.bar", second_listener)
+        py_event_dispatcher.register("foo.bar", first_listener)
+        py_event_dispatcher.register("foo.bar", second_listener)
         py_event_dispatcher.dispatch(PyEvent("foo.bar", {}))
 
         captured = capsys.readouterr()
