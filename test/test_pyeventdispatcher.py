@@ -7,7 +7,12 @@ from pyeventdispatcher import (
     PyEvent,
     PyEventDispatcherException,
     PyEventSubscriber,
-    listen
+    listen,
+)
+from pyeventdispatcher.event_dispatcher import (
+    GlobalMemoryRegistry,
+    register_global_listener,
+    register_event_subscribers,
 )
 
 
@@ -33,19 +38,19 @@ class TestRegister:
         [
             # With default "priority" - in order they were added
             (
-                    (
-                            {"lambda": lambda event: print("First"), "priority": 0},
-                            {"lambda": lambda event: print("Second"), "priority": 0},
-                    ),
-                    "First\nSecond\n",
+                (
+                    {"lambda": lambda event: print("First"), "priority": 0},
+                    {"lambda": lambda event: print("Second"), "priority": 0},
+                ),
+                "First\nSecond\n",
             ),
             # Based on priority
             (
-                    (
-                            {"lambda": lambda event: print("First"), "priority": 0},
-                            {"lambda": lambda event: print("Second"), "priority": -100},
-                    ),
-                    "Second\nFirst\n",
+                (
+                    {"lambda": lambda event: print("First"), "priority": 0},
+                    {"lambda": lambda event: print("Second"), "priority": -100},
+                ),
+                "Second\nFirst\n",
             ),
         ],
     )
@@ -77,7 +82,7 @@ class TestRegister:
 
 class TestRegisterGlobal:
     def setup_method(self):
-        PyEventDispatcher._GLOBAL_LISTENERS = defaultdict(list)
+        GlobalMemoryRegistry._LISTENERS = defaultdict(list)
 
     def test_it_allows_to_register_listener_globally(self, capsys):
         def my_listener(event):
@@ -86,7 +91,7 @@ class TestRegisterGlobal:
         def global_listener(event):
             print("global")
 
-        PyEventDispatcher.register("foo.bar", global_listener)
+        register_global_listener("foo.bar", global_listener)
 
         py_event_dispatcher_1 = PyEventDispatcher()
         py_event_dispatcher_1.register_local("foo.bar", my_listener)
@@ -101,7 +106,7 @@ class TestRegisterGlobal:
 
 class TestRegisterSubscribers:
     def setup_method(self):
-        PyEventDispatcher._GLOBAL_LISTENERS = defaultdict(list)
+        GlobalMemoryRegistry._LISTENERS = defaultdict(list)
 
     class MySubscriber1(PyEventSubscriber):
         EVENTS = {"foo.bar": "execute_one", "bar.foo": ("execute_two", -10)}
@@ -115,8 +120,8 @@ class TestRegisterSubscribers:
             print("MySubscriber1::execute_two")
 
     def test_register_global_listeners_by_subscriber(self, capsys):
+        register_event_subscribers()
         py_event_dispatcher = PyEventDispatcher()
-        py_event_dispatcher.register_subscribers()
         py_event_dispatcher.dispatch(PyEvent("foo.bar", None))
 
         captured = capsys.readouterr()
@@ -125,7 +130,7 @@ class TestRegisterSubscribers:
 
 class TestRegisterThroughDecorator:
     def setup_method(self):
-        PyEventDispatcher._GLOBAL_LISTENERS = defaultdict(list)
+        GlobalMemoryRegistry._LISTENERS = defaultdict(list)
 
     def test_register_global_listener_by_decorator(self, capsys):
         @listen("foo.bar")
@@ -141,7 +146,7 @@ class TestRegisterThroughDecorator:
 
 class TestStopPropagation:
     def setup_method(self):
-        PyEventDispatcher._GLOBAL_LISTENERS = defaultdict(list)
+        GlobalMemoryRegistry._LISTENERS = defaultdict(list)
 
     def test_it_stops_propagation(self, capsys):
         def first_listener(event):

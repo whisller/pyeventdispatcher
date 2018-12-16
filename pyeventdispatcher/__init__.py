@@ -1,12 +1,14 @@
 from pyeventdispatcher.event_dispatcher import (
+    dispatch_global,
     PyEventDispatcher,
     PyEvent,
     PyEventDispatcherException,
     PyEventSubscriber,
-    listen
+    listen,
+    register_global_listener,
 )
 
 __version__ = "0.1.0-alpha"
 
-register = PyEventDispatcher.register
-dispatch = PyEventDispatcher.dispatch_global
+register = register_global_listener
+dispatch = dispatch_global
