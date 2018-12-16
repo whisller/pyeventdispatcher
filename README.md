@@ -11,7 +11,7 @@ Inspiration for that was Symfony's [event-dispatcher](https://symfony.com/doc/cu
 
 **Disclaimer**
 
-Application is in very early stage of development. Quite a lot of things might change in interface :)
+Library is in very early stage of development. A lot of things can change, which includes breaking changes.
 
 ## Installation
 ```bash
