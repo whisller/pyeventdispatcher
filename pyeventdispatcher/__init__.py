@@ -9,7 +9,7 @@ from pyeventdispatcher.event_dispatcher import (
     register_event_subscribers,
 )
 
-__version__ = "0.2.2a0"
+__version__ = "0.2.3a0"
 
 register = register_global_listener
 dispatch = dispatch_global_event
