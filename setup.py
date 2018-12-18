@@ -21,8 +21,7 @@ with open("Pipfile.lock") as fd:
 setup(
     name="pyeventdispatcher",
     version=__version__,
-    description="PyEventDispatcher allows your application components to communicate with each other by sending events "
-                "and listening to them.",
+    description="Your application components can communicate by sending and listening to events.",
     long_description=README,
     long_description_content_type="text/markdown",
     keywords="event dispatcher event-dispatcher",
