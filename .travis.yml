@@ -5,5 +5,4 @@ install:
   - "pip install pipenv"
   - "pipenv install --dev"
 script:
-  - "black --check pyeventdispatcher test"
-  - "pytest test -vv"
+  - "invoke check-all"

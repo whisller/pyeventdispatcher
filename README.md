@@ -1,7 +1,9 @@
 PyEventDispatcher
 ---
+| master  | develop | PyPI | Python | Licence |
+| --- | --- | --- | --- | --- |
+| [![Build Status](https://travis-ci.org/whisller/pyeventdispatcher.svg?branch=master)](https://travis-ci.org/whisller/pyeventdispatcher)  | [![Build Status](https://travis-ci.org/whisller/pyeventdispatcher.svg?branch=develop)](https://travis-ci.org/whisller/pyeventdispatcher)  | [![PyPI](https://img.shields.io/pypi/v/pyeventdispatcher.svg)](https://pypi.org/project/pyeventdispatcher/) | ![](https://img.shields.io/pypi/pyversions/pyeventdispatcher.svg) | ![](https://img.shields.io/pypi/l/pyeventdispatcher.svg) |
 
-[![Build Status](https://travis-ci.org/whisller/pyeventdispatcher.svg?branch=master)](https://travis-ci.org/whisller/pyeventdispatcher)
 ---
 
 PyEventDispatcher allows your application components to communicate with each

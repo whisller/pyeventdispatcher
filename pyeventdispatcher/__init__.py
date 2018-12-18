@@ -6,10 +6,10 @@ from pyeventdispatcher.event_dispatcher import (
     EventDispatcherException,
     EventSubscriber,
     register_global_listener,
-    register_event_subscribers
+    register_event_subscribers,
 )
 
-__version__ = "0.1.0a0"
+__version__ = "0.2.0a0"
 
 register = register_global_listener
 dispatch = dispatch_global_event
