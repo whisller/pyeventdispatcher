@@ -8,6 +8,7 @@ name = "pypi"
 [dev-packages]
 pytest = "*"
 black = "*"
+invoke = "*"
 
 [requires]
 python_version = "3.7"
