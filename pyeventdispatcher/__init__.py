@@ -6,7 +6,7 @@ from pyeventdispatcher.event_dispatcher import (
     EventDispatcherException,
     EventSubscriber,
     register_global_listener,
-    register_event_subscribers
+    register_event_subscribers,
 )
 
 __version__ = "0.1.0a0"
